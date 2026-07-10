@@ -123,7 +123,10 @@ export default function Home() {
 
       <footer><div className="logo">Savia<span>.</span></div><p>Un lugar para volver a ti.</p><div><span>Calle 12 #34–56 · Cali</span><span>Lun–Sáb · 7:00–20:00</span><span>hola@saviayoga.demo</span></div><small>Proyecto demostrativo · La información del negocio es ficticia.</small></footer>
 
-      <button className={`chat-launcher ${chatOpen ? "active" : ""}`} onClick={() => setChatOpen(!chatOpen)} aria-label="Abrir asistente">{chatOpen ? "×" : "◌"}<span>¿Tienes preguntas?</span></button>
+      <button className={`chat-launcher ${chatOpen ? "active" : ""}`} onClick={() => setChatOpen(!chatOpen)} aria-label={chatOpen ? "Cerrar asistente" : "Abrir asistente"}>
+        {chatOpen ? "×" : "◌"}
+        {!chatOpen && <span>¿Tienes preguntas?</span>}
+      </button>
       {chatOpen && <aside className="chat-panel" aria-label="Chat con Alma">
         <div className="chat-head"><div className="avatar">A</div><div><b>Alma</b><small><i /> Asistente de Savia</small></div><button onClick={() => setChatOpen(false)}>×</button></div>
         <div className="chat-messages">{messages.map((m, i) => <div key={i} className={`message ${m.role}`}>{renderMessage(m.text)}</div>)}{loading && <div className="message assistant typing">•••</div>}<div ref={endRef} /></div>
