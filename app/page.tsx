@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 
 const classes = [
   { icon: "☼", title: "Hatha suave", text: "Posturas conscientes y respiración para comenzar con calma.", level: "Todos los niveles", time: "60 min" },
@@ -50,10 +50,6 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", text: "Hola, soy Alma ✦ ¿Qué te gustaría saber sobre nuestras clases, horarios o planes?" },
   ]);
-  const endRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), [messages, loading]);
-
   async function sendMessage(e: FormEvent) {
     e.preventDefault();
     const question = input.trim();
@@ -133,7 +129,7 @@ export default function Home() {
       </button>
       {chatOpen && <aside className="chat-panel" aria-label="Chat con Alma">
         <div className="chat-head"><div className="avatar">A</div><div><b>Alma</b><small><i /> Asistente de Savia</small></div><button onClick={() => setChatOpen(false)}>×</button></div>
-        <div className="chat-messages">{messages.map((m, i) => <div key={i} className={`message ${m.role}`}>{renderMessage(m.text)}</div>)}{loading && <div className="message assistant typing">•••</div>}<div ref={endRef} /></div>
+        <div className="chat-messages">{messages.map((m, i) => <div key={i} className={`message ${m.role}`}>{renderMessage(m.text)}</div>)}{loading && <div className="message assistant typing">•••</div>}</div>
         <div className="suggestions">{["¿Cuánto cuesta?", "¿Hay clases para principiantes?"].map(q => <button key={q} onClick={() => setInput(q)}>{q}</button>)}</div>
         <form onSubmit={sendMessage}><input value={input} onChange={e => setInput(e.target.value)} placeholder="Escribe tu pregunta…" aria-label="Tu pregunta" /><button disabled={loading} aria-label="Enviar">↑</button></form>
         <small className="chat-note">Alma responde con la información de Savia.</small>
