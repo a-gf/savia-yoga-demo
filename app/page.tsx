@@ -33,8 +33,8 @@ const faqs = [
 
 type Message = { role: "user" | "assistant"; text: string };
 
-function renderMessage(text: string) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+function renderMessage(text: unknown) {
+  const parts = String(text ?? "").split(/(\*\*[^*]+\*\*)/g);
   return parts.map((part, index) =>
     part.startsWith("**") && part.endsWith("**")
       ? <strong key={index}>{part.slice(2, -2)}</strong>
@@ -67,8 +67,12 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, sessionId: getSessionId() }),
       });
+      if (!response.ok) throw new Error(`Chat request failed: ${response.status}`);
       const data = await response.json();
-      setMessages((m) => [...m, { role: "assistant", text: data.answer }]);
+      const answer = typeof data.answer === "string"
+        ? data.answer
+        : "No pude interpretar la respuesta. Inténtalo nuevamente.";
+      setMessages((m) => [...m, { role: "assistant", text: answer }]);
     } catch {
       setMessages((m) => [...m, { role: "assistant", text: "No pude conectarme en este momento. Inténtalo de nuevo en unos minutos." }]);
     } finally { setLoading(false); }
@@ -140,7 +144,15 @@ export default function Home() {
 
 function getSessionId() {
   if (typeof window === "undefined") return "web-session";
-  let id = sessionStorage.getItem("savia-session");
-  if (!id) { id = crypto.randomUUID(); sessionStorage.setItem("savia-session", id); }
-  return id;
+  try {
+    let id = sessionStorage.getItem("savia-session");
+    if (!id) {
+      id = globalThis.crypto?.randomUUID?.()
+        ?? `savia-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      sessionStorage.setItem("savia-session", id);
+    }
+    return id;
+  } catch {
+    return `savia-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
 }
